@@ -6,4 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-install(FILES DESTINATION share/gnuradio/grc/blocks)
+install(FILES
+    selcall_selcal_decoder.block.yml
+    selcall_selcall_encoder.block.yml DESTINATION share/gnuradio/grc/blocks)

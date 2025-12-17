@@ -19,7 +19,9 @@ add_subdirectory(bindings)
 ########################################################################
 # Install python sources
 ########################################################################
-gr_python_install(FILES __init__.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall)
+gr_python_install(FILES __init__.py
+    selcal_decoder.py
+    selcall_encoder.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall)
 
 ########################################################################
 # Handle the unit tests
@@ -34,3 +36,5 @@ add_custom_target(
     copy_module_for_tests ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}
             ${PROJECT_BINARY_DIR}/test_modules/gnuradio/selcall/)
+GR_ADD_TEST(qa_selcal_decoder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_selcal_decoder.py)
+GR_ADD_TEST(qa_selcall_encoder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_selcall_encoder.py)
