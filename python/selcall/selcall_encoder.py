@@ -20,7 +20,7 @@ class selcall_encoder(gr.sync_block):
     def __init__(self, sample_rate=48000, protocol="ZVEI-1", amplitude=0.8, own_id="12345"):
         gr.sync_block.__init__(
             self,
-            name='SelCall Generator',
+            name='SelCall Encoder',
             in_sig=None,  # Message input only
             out_sig=[np.float32]  # Audio output
         )
@@ -97,7 +97,7 @@ class selcall_encoder(gr.sync_block):
             self.repeater_char = PCCIR_TONE_CH_REPEATER
 
         else:
-            print(f"[SelCall Encoder] Protocollo {p} sconosciuto, uso ZVEI-1")
+            print(f"[SelCall Encoder] Unknown protocol {p}, using ZVEI-1")
             vals = ZVEI1_VALUES
             syms = ZVEI1_SYMBOLS
             duration_ms = 70.0
@@ -114,7 +114,7 @@ class selcall_encoder(gr.sync_block):
             self.pause_freq = 0.0
 
         # Debug Info
-        print(f"[SelCall Encoder] Protocollo: {p}")
+        print(f"[SelCall Encoder] Protocol: {p}")
         print(f"[SelCall Encoder] Tone Duration: {self.tone_duration_s*1000} ms")
         print(f"[SelCall Encoder] Pause Frequency: {self.pause_freq} Hz")
 
@@ -134,13 +134,15 @@ class selcall_encoder(gr.sync_block):
         """
 
         # FIXME: Extract destination code from PMT message
-        try:
-            dest_code = pmt.symbol_to_string(msg)
-        except:
-            try:
-                dest_code = str(pmt.to_python(msg))
-            except:
-                return
+        if pmt.is_null(msg):
+            print("[SelCall Encoder] Received null message, ignoring.")
+            return
+
+        dest_code = pmt.to_python(msg)[1]  # Assuming msg is a PMT symbol
+
+        if not dest_code:
+            print("[SelCall Encoder] Received empty destination code, ignoring.")
+            return
 
         # Building the complete sequence: SOURCE - RECIPIENT
         # The character “-” will tell the next loop to insert the pause.
