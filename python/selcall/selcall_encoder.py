@@ -1,29 +1,189 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Copyright 2025 gr-selcall author.
-#
-# SPDX-License-Identifier: GPL-3.0-or-later
-#
+"""
+Embedded Python Block: SelCall Generator (TX)
+"""
 
-
-import numpy
+import numpy as np
 from gnuradio import gr
+import pmt
+
+from python.selcall.protocols.CCIR import *
+from python.selcall.protocols.ZVEI import *
+
 
 class selcall_encoder(gr.sync_block):
     """
-    docstring for block selcall_encoder
+    SelCall Generator Block for GNU Radio.
+    Generates ZVEI/CCIR tones upon receiving a destination code via message.
+    Combines Personal Code (Param) + Pause + Destination Code (Msg).
     """
-    def __init__(self):
-        gr.sync_block.__init__(self,
-            name="selcall_encoder",
-            in_sig=[<+numpy.float32+>, ],
-            out_sig=[<+numpy.float32+>, ])
 
+    def __init__(self, sample_rate=48000, protocol="ZVEI-1", amplitude=0.8, own_id="12345"):
+        gr.sync_block.__init__(
+            self,
+            name='SelCall Generator',
+            in_sig=None,  # Message input only
+            out_sig=[np.float32]  # Audio output
+        )
+
+        self.fs = sample_rate
+        self.amplitude = amplitude
+        self.protocol = protocol
+        self.own_id = str(own_id)  # Must be a string
+
+        # --- Setup Protocollo ---
+        self.tone_map = {}  # Dictionary { 'Char': Freq }
+        self.tone_duration_s = 0.07  # Default 70ms
+        self.pause_freq = 0.0  # Frequency during the separating pause (0 = silence)
+        self.repeater_char = 'E'  # Symbol used for repetitions
+
+        self._configure_protocol()
+
+        # --- Audio Buffer ---
+        self.audio_buffer = np.array([], dtype=np.float32)
+        self.buffer_index = 0
+        self.transmitting = False
+
+        # --- Message Port ---
+        self.port_name = pmt.intern("msg_in")
+        self.message_port_register_in(self.port_name)
+        self.set_msg_handler(self.port_name, self.handle_msg)
+
+    def _configure_protocol(self):
+        """
+        Configures frequency tables and times based on user selection
+        """
+        p = self.protocol.upper()
+
+        vals = []
+        syms = []
+        duration_ms = 70.0
+
+        # Get the specific pause frequency if available (e.g. ZVEI_TONE_CH_PAUSE)
+        # If it is a numerical constant (Hz) in the protocol file, we use it.
+        # Otherwise, default to 0 (silence).
+        pause_val = 0
+
+        if p == "ZVEI-1":
+            vals = ZVEI1_VALUES
+            syms = ZVEI1_SYMBOLS
+            duration_ms = ZVEI_TONE_MS
+            pause_val = ZVEI_TONE_CH_PAUSE
+            self.repeater_char = ZVEI_TONE_CH_REPEATER
+
+        elif p == "ZVEI-2":
+            vals = ZVEI2_VALUES
+            syms = ZVEI2_SYMBOLS
+            duration_ms = ZVEI_TONE_MS
+            pause_val = ZVEI_TONE_CH_PAUSE  # Assumiamo sia definito anche qui o usiamo default
+            self.repeater_char = ZVEI_TONE_CH_REPEATER
+
+        elif p in ["CCIR-1", "CCIR-2", "CCIR-7"]:
+            vals = CCIR_VALUES
+            syms = CCIR_SYMBOLS
+            duration_ms = CCIR_CODE_LEN_MS.get(p, 100.0)
+            pause_val = CCIR_TONE_CH_PAUSE
+            self.repeater_char = CCIR_TONE_CH_REPEATER
+
+        elif p == "PCCIR":
+            vals = PCCIR_VALUES
+            syms = PCCIR_SYMBOLS
+            duration_ms = 100.0
+            pause_val = CCIR_TONE_CH_PAUSE
+            self.repeater_char = PCCIR_TONE_CH_REPEATER
+
+        else:
+            print(f"[SelCall Encoder] Protocollo {p} sconosciuto, uso ZVEI-1")
+            vals = ZVEI1_VALUES
+            syms = ZVEI1_SYMBOLS
+            duration_ms = 70.0
+            pause_val = ZVEI_TONE_CH_PAUSE
+            self.repeater_char = ZVEI_TONE_CH_REPEATER
+
+        self.tone_map = dict(zip(syms, vals))
+        self.tone_duration_s = duration_ms / 1000.0
+
+        # If pauses_val is a number (frequency), we use it. If it is an index or something else, we use 0.
+        if isinstance(pause_val, (int, float)):
+            self.pause_freq = float(pause_val)
+        else:
+            self.pause_freq = 0.0
+
+    def generate_sine(self, freq, duration_s):
+        """ Generates a pure sine wave at a certain frequency and for a certain duration. """
+        if freq <= 0:
+            return np.zeros(int(self.fs * duration_s), dtype=np.float32)
+
+        t = np.arange(int(self.fs * duration_s)) / self.fs
+        return (self.amplitude * np.sin(2 * np.pi * freq * t)).astype(np.float32)
+
+    def handle_msg(self, msg):
+        """
+        Callback messages.
+        The message contains ONLY the recipient code (e.g. ‘67890’).
+        The block constructs: Source + “-” + Dest (e.g. ‘12345-67890’).
+        """
+        try:
+            dest_code = pmt.symbol_to_string(msg)
+        except:
+            try:
+                dest_code = str(pmt.to_python(msg))
+            except:
+                return
+
+        # Building the complete sequence: SOURCE - RECIPIENT
+        # The character “-” will tell the next loop to insert the pause.
+        full_sequence = f"{self.own_id}-{dest_code}"
+
+        print(f"[SelCall Encoder] Sent: {self.own_id} -> {dest_code} (Seq: {full_sequence})")
+
+        full_wave = np.array([], dtype=np.float32)
+
+        # Split to manage parts (Part 0 = Source, Part 1 = Dest)
+        parts = full_sequence.split('-')
+
+        for i, part in enumerate(parts):
+            # If we are between one part and another, we insert a pause.
+            if i > 0:
+                pause_wave = self.generate_sine(self.pause_freq, self.tone_duration_s)
+                full_wave = np.concatenate((full_wave, pause_wave))
+
+            last_char = None
+
+            for char in part:
+                target_char = char
+
+                # Repeat Tone Logic (e.g. 11 -> 1E)
+                if char == last_char:
+                    target_char = self.repeater_char
+
+                freq = self.tone_map.get(target_char, 0.0)
+                tone = self.generate_sine(freq, self.tone_duration_s)
+                full_wave = np.concatenate((full_wave, tone))
+
+                last_char = char
+
+        self.audio_buffer = full_wave
+        self.buffer_index = 0
+        self.transmitting = True
 
     def work(self, input_items, output_items):
-        in0 = input_items[0]
         out = output_items[0]
-        # <+signal processing here+>
-        out[:] = in0
-        return len(output_items[0])
+        n_out = len(out)
+        n_written = 0
+
+        if self.transmitting:
+            remaining = len(self.audio_buffer) - self.buffer_index
+
+            if remaining > 0:
+                to_write = min(n_out, remaining)
+                out[:to_write] = self.audio_buffer[self.buffer_index: self.buffer_index + to_write]
+                self.buffer_index += to_write
+                n_written = to_write
+            else:
+                self.transmitting = False
+                self.buffer_index = 0
+
+        if n_written < n_out:
+            out[n_written:] = 0.0
+
+        return n_out
