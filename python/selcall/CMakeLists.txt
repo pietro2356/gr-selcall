@@ -19,9 +19,25 @@ add_subdirectory(bindings)
 ########################################################################
 # Install python sources
 ########################################################################
-gr_python_install(FILES __init__.py
+gr_python_install(
+    FILES
+    __init__.py
     selcall_decoder.py
-    selcall_encoder.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall)
+    selcall_encoder.py
+    DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall
+)
+
+install(
+    DIRECTORY protocols
+    DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall
+    FILES_MATCHING PATTERN "*.py"
+)
+
+install(
+    DIRECTORY core
+    DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall
+    FILES_MATCHING PATTERN "*.py"
+)
 
 ########################################################################
 # Handle the unit tests
