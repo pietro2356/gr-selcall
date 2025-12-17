@@ -1,0 +1,234 @@
+options:
+  parameters:
+    author: ''
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: selcall_test
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: SelCal Flow Test
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: audio_samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '48000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 12]
+    rotation: 0
+    state: enabled
+- name: sel_choser
+  id: variable_qtgui_chooser
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: Selective List
+    label0: CO 118 T
+    label1: MSA1 - T
+    label2: MSA2 - T
+    label3: MSB1 - CB
+    label4: ELI1 - DD
+    labels: '[]'
+    num_opts: '5'
+    option0: '18501'
+    option1: '18533'
+    option2: '18537'
+    option3: '19931'
+    option4: '18515'
+    options: '[0, 1, 2]'
+    orient: Qt.QVBoxLayout
+    type: string
+    value: '18533'
+    widget: combo_box
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 112.0]
+    rotation: 0
+    state: enabled
+- name: sel_id
+  id: variable_qtgui_entry
+  parameters:
+    comment: ''
+    entry_signal: editingFinished
+    gui_hint: ''
+    label: Selective
+    type: string
+    value: sel_choser
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [328, 8.0]
+    rotation: 0
+    state: enabled
+- name: Sel_sender
+  id: variable_qtgui_msg_push_button
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: 'Send '
+    msgName: pressed
+    relBackgroundColor: default
+    relFontColor: default
+    type: string
+    value: sel_id
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [160, 152.0]
+    rotation: 0
+    state: enabled
+- name: audio_sink_0
+  id: audio_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    device_name: ''
+    num_inputs: '1'
+    ok_to_block: 'True'
+    samp_rate: audio_samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [752, 272.0]
+    rotation: 0
+    state: enabled
+- name: audio_sink_0_0
+  id: audio_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    device_name: ''
+    num_inputs: '1'
+    ok_to_block: 'True'
+    samp_rate: audio_samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1064, 144.0]
+    rotation: 0
+    state: enabled
+- name: blocks_message_debug_0
+  id: blocks_message_debug
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    en_uvec: 'True'
+    log_level: info
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1064, 208.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_ledindicator_0
+  id: qtgui_ledindicator
+  parameters:
+    affinity: ''
+    alias: ''
+    cellalignment: '2'
+    comment: ''
+    gui_hint: ''
+    label: TX
+    maxSize: '40'
+    offColor: red
+    onColor: green
+    position: '1'
+    state: 'False'
+    verticalalignment: '2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [752, 344.0]
+    rotation: 0
+    state: enabled
+- name: selcall_selcall_decoder_0
+  id: selcall_selcall_decoder
+  parameters:
+    affinity: ''
+    alias: ''
+    code_length: '5'
+    comment: ''
+    debug: 'False'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    protocol: CCIR-1
+    sample_rate: audio_samp_rate
+    target_code: '18537'
+    tone_duration_ms: '0.0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [752, 128.0]
+    rotation: 0
+    state: enabled
+- name: selcall_selcall_encoder_0
+  id: selcall_selcall_encoder
+  parameters:
+    affinity: ''
+    alias: ''
+    amplitude: '0.8'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    own_id: '11501'
+    protocol: CCIR-1
+    sample_rate: audio_samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [440, 152.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [Sel_sender, pressed, selcall_selcall_encoder_0, msg_in]
+- [selcall_selcall_decoder_0, '0', audio_sink_0_0, '0']
+- [selcall_selcall_decoder_0, selcall_out, blocks_message_debug_0, print]
+- [selcall_selcall_encoder_0, '0', audio_sink_0, '0']
+- [selcall_selcall_encoder_0, '0', selcall_selcall_decoder_0, '0']
+- [selcall_selcall_encoder_0, ptt_out, qtgui_ledindicator_0, state]
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.12.0
