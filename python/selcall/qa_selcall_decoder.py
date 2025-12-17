@@ -10,7 +10,7 @@ from gnuradio import gr, gr_unittest
 # from gnuradio import blocks
 from gnuradio.selcall import selcal_decoder
 
-class qa_selcal_decoder(gr_unittest.TestCase):
+class qa_selcall_decoder(gr_unittest.TestCase):
 
     def setUp(self):
         self.tb = gr.top_block()
@@ -29,4 +29,4 @@ class qa_selcal_decoder(gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_selcal_decoder)
+    gr_unittest.run(qa_selcall_decoder)

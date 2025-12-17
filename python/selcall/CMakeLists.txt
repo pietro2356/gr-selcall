@@ -20,7 +20,7 @@ add_subdirectory(bindings)
 # Install python sources
 ########################################################################
 gr_python_install(FILES __init__.py
-    selcal_decoder.py
+    selcall_decoder.py
     selcall_encoder.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall)
 
 ########################################################################

@@ -1,10 +1,10 @@
-id: selcall_selcal_decoder
-label: selcal_decoder
+id: selcall_selcall_decoder
+label: selcall_decoder
 category: '[selcall]'
 
 templates:
   imports: from gnuradio import selcall
-  make: selcall.selcal_decoder()
+  make: selcall.selcall_decoder()
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -16,7 +16,7 @@ parameters:
 - id: parametername_replace_me
   label: FIX ME
   dtype: string
-  default: You need to fill in your grc/selcall_selcal_decoder.block.yaml
+  default: You need to fill in your grc/selcall_selcall_decoder.block.yaml
 #- id: ...
 #  label: ...
 #  dtype: ...

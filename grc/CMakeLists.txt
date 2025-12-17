@@ -7,5 +7,5 @@
 #
 
 install(FILES
-    selcall_selcal_decoder.block.yml
+    selcall_selcall_decoder.block.yml
     selcall_selcall_encoder.block.yml DESTINATION share/gnuradio/grc/blocks)
