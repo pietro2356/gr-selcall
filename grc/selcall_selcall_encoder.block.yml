@@ -8,7 +8,8 @@ templates:
     selcall.selcall_encoder(
         sample_rate=${sample_rate},
         protocol=${protocol},
-        amplitude=${amplitude}
+        amplitude=${amplitude},
+        own_id=${own_id}
     )
     
 
@@ -47,5 +48,10 @@ outputs:
 - label: audio_out
   domain: stream
   dtype: float
+
+- label: ptt_out
+  id: ptt_out
+  domain: message
+  optional: true
 
 file_format: 1

@@ -42,11 +42,16 @@ class selcall_encoder(gr.sync_block):
         self.audio_buffer = np.array([], dtype=np.float32)
         self.buffer_index = 0
         self.transmitting = False
+        self.last_tx_state = False  # Per edge detection
 
         # --- Message Port ---
         self.port_name = pmt.intern("msg_in")
         self.message_port_register_in(self.port_name)
         self.set_msg_handler(self.port_name, self.handle_msg)
+
+        # --- PTT Output Port ---
+        self.port_name_ptt = pmt.intern("ptt_out")
+        self.message_port_register_out(self.port_name_ptt)
 
     def _configure_protocol(self):
         """
@@ -67,28 +72,28 @@ class selcall_encoder(gr.sync_block):
             vals = ZVEI1_VALUES
             syms = ZVEI1_SYMBOLS
             duration_ms = ZVEI_TONE_MS
-            pause_val = ZVEI_TONE_CH_PAUSE
+            pause_val = ZVEI_TONE_CH_EOM_FREQ
             self.repeater_char = ZVEI_TONE_CH_REPEATER
 
         elif p == "ZVEI-2":
             vals = ZVEI2_VALUES
             syms = ZVEI2_SYMBOLS
             duration_ms = ZVEI_TONE_MS
-            pause_val = ZVEI_TONE_CH_PAUSE  # Assumiamo sia definito anche qui o usiamo default
+            pause_val = ZVEI_TONE_CH_EOM_FREQ  # Assumiamo sia definito anche qui o usiamo default
             self.repeater_char = ZVEI_TONE_CH_REPEATER
 
         elif p in ["CCIR-1", "CCIR-2", "CCIR-7"]:
             vals = CCIR_VALUES
             syms = CCIR_SYMBOLS
             duration_ms = CCIR_CODE_LEN_MS.get(p, 100.0)
-            pause_val = CCIR_TONE_CH_PAUSE
+            pause_val = CCIR_TONE_CH_EOM_FREQ
             self.repeater_char = CCIR_TONE_CH_REPEATER
 
         elif p == "PCCIR":
             vals = PCCIR_VALUES
             syms = PCCIR_SYMBOLS
             duration_ms = 100.0
-            pause_val = CCIR_TONE_CH_PAUSE
+            pause_val = CCIR_TONE_CH_EOM_FREQ
             self.repeater_char = PCCIR_TONE_CH_REPEATER
 
         else:
@@ -96,7 +101,7 @@ class selcall_encoder(gr.sync_block):
             vals = ZVEI1_VALUES
             syms = ZVEI1_SYMBOLS
             duration_ms = 70.0
-            pause_val = ZVEI_TONE_CH_PAUSE
+            pause_val = ZVEI_TONE_CH_EOM_FREQ
             self.repeater_char = ZVEI_TONE_CH_REPEATER
 
         self.tone_map = dict(zip(syms, vals))
@@ -107,6 +112,11 @@ class selcall_encoder(gr.sync_block):
             self.pause_freq = float(pause_val)
         else:
             self.pause_freq = 0.0
+
+        # Debug Info
+        print(f"[SelCall Encoder] Protocollo: {p}")
+        print(f"[SelCall Encoder] Tone Duration: {self.tone_duration_s*1000} ms")
+        print(f"[SelCall Encoder] Pause Frequency: {self.pause_freq} Hz")
 
     def generate_sine(self, freq, duration_s):
         """ Generates a pure sine wave at a certain frequency and for a certain duration. """
@@ -122,6 +132,8 @@ class selcall_encoder(gr.sync_block):
         The message contains ONLY the recipient code (e.g. ‘67890’).
         The block constructs: Source + “-” + Dest (e.g. ‘12345-67890’).
         """
+
+        # FIXME: Extract destination code from PMT message
         try:
             dest_code = pmt.symbol_to_string(msg)
         except:
@@ -166,10 +178,25 @@ class selcall_encoder(gr.sync_block):
         self.buffer_index = 0
         self.transmitting = True
 
+    # --- Helper functions for PTT / Messaging ---s
+    def _send_ptt_message(self, state):
+        """Builds and sends the Boolean PMT message for PTT state."""
+        msg = pmt.cons(pmt.intern("value"), pmt.from_bool(state))
+        self.message_port_pub(self.port_name_ptt, msg)
+
+    def _update_ptt_status(self):
+        """Check whether the transmission status has changed and notify if needed"""
+        if self.transmitting != self.last_tx_state:
+            self._send_ptt_message(self.transmitting)
+            self.last_tx_state = self.transmitting
+
     def work(self, input_items, output_items):
         out = output_items[0]
         n_out = len(out)
         n_written = 0
+
+        # 1. Gestione Stato PTT (Check & Notify)
+        self._update_ptt_status()
 
         if self.transmitting:
             remaining = len(self.audio_buffer) - self.buffer_index
