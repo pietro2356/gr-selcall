@@ -2,16 +2,15 @@
 Embedded Python Block: SelCall Decoder
 """
 
-import numpy as np
 from gnuradio import gr
 import pmt
 import time
 
 # Import logic from the provided library files
 # Note: In a standard OOT module, imports might look like 'from my_module import ...'
-from python.selcall.protocols.CCIR import *
-from python.selcall.protocols.ZVEI import *
-from python.selcall.core.SelectiveCalling import SelectiveCalling
+from .core.protocols.CCIR import *
+from .core.protocols.ZVEI import *
+from .core.SelectiveCalling import SelectiveCalling
 
 class selcall_decoder(gr.sync_block):
     """

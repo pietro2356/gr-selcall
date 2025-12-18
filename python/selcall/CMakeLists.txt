@@ -28,16 +28,16 @@ gr_python_install(
 )
 
 install(
-    DIRECTORY protocols
-    DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall
-    FILES_MATCHING PATTERN "*.py"
-)
-
-install(
     DIRECTORY core
     DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall
     FILES_MATCHING PATTERN "*.py"
 )
+
+#install(
+#    DIRECTORY protocols
+#    DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall/core
+#    FILES_MATCHING PATTERN "*.py"
+#)
 
 ########################################################################
 # Handle the unit tests

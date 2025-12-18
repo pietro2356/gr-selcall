@@ -2,8 +2,8 @@ from typing import List, Tuple, Optional
 import numpy as np
 from scipy.signal import butter, filtfilt
 
-from python.selcall.protocols.CCIR import *
-from python.selcall.protocols.ZVEI import *
+from .protocols.CCIR import *
+from .protocols.ZVEI import *
 
 class SelectiveCalling:
     def __init__(self, debug: bool = False):

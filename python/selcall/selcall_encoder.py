@@ -2,12 +2,11 @@
 Embedded Python Block: SelCall Generator (TX)
 """
 
-import numpy as np
 from gnuradio import gr
 import pmt
 
-from python.selcall.protocols.CCIR import *
-from python.selcall.protocols.ZVEI import *
+from .core.protocols.CCIR import *
+from .core.protocols.ZVEI import *
 
 
 class selcall_encoder(gr.sync_block):
