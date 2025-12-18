@@ -106,7 +106,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [160, 152.0]
+    coordinate: [152, 152.0]
     rotation: 0
     state: enabled
 - name: audio_sink_0
@@ -123,7 +123,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 272.0]
+    coordinate: [592, 320.0]
     rotation: 0
     state: enabled
 - name: audio_sink_0_0
@@ -177,7 +177,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 344.0]
+    coordinate: [536, 416.0]
     rotation: 0
     state: enabled
 - name: selcall_selcall_decoder_0
