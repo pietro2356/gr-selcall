@@ -127,7 +127,7 @@ add_custom_target(uninstall ${CMAKE_COMMAND} -P
 # Add subdirectories
 ########################################################################
 add_subdirectory(include/gnuradio/selcall)
-add_subdirectory(lib)
+#add_subdirectory(lib)
 add_subdirectory(apps)
 add_subdirectory(examples)
 add_subdirectory(docs)
