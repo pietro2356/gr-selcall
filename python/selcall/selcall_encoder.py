@@ -4,6 +4,7 @@ Embedded Python Block: SelCall Generator (TX)
 
 from gnuradio import gr
 import pmt
+import time
 
 from .core.protocols.CCIR import *
 from .core.protocols.ZVEI import *
@@ -156,8 +157,8 @@ class selcall_encoder(gr.sync_block):
         parts = full_sequence.split('-')
 
         # === Add Initial Silence (Padding) ===
-        # 50ms of silence to allow time for the TX to open
-        padding = np.zeros(int(self.fs * 0.05), dtype=np.float32)
+        # 700ms of silence to allow time for the TX to open
+        padding = np.zeros(int(self.fs * 0.7), dtype=np.float32)
         full_wave = np.concatenate((full_wave, padding))
         # ========================================================
 
@@ -207,52 +208,55 @@ class selcall_encoder(gr.sync_block):
             self.last_tx_state = self.transmitting
 
     def work(self, input_items, output_items):
-        out = output_items[0]
-        n_out = len(out)
+        out_audio = output_items[0]
+        n_out = len(out_audio)
         n_written = 0
 
-        # 1. Gestione Stato PTT (Check & Notify)
-        self._update_ptt_status()
+        # 1. GUI management (Active Message)
+        if self.transmitting != self.last_tx_state:
+            self._send_ptt_message(self.transmitting)
+            self.last_tx_state = self.transmitting
 
-        if self.transmitting:
-            remaining = len(self.audio_buffer) - self.buffer_index
+        # 2. IF WE ARE NOT TRANSMITTING:
+        # Do not produce anything. Return 0.
+        # This forces the USRP to empty the buffer and shut down (Underrun).
+        if not self.transmitting:
+            time.sleep(0.01)  # Short sleep to avoid overloading the CPU
+            return 0
 
-            # === Insertion of START tag (tx_sob) ===
-            if self.new_burst_started:
-                # Writes the tag on sample number 0 of this block
-                self.add_item_tag(0,  # Output port (0)
-                                  self.nitems_written(0),  # Absolute index of the sample
-                                  pmt.intern("tx_sob"),  # Key
-                                  pmt.PMT_T)  # Value (True)
-                self.new_burst_started = False
-            # ==================================================
+        # 3. IF WE ARE TRANSMITTING:
+        remaining = len(self.audio_buffer) - self.buffer_index
 
-            if remaining > 0:
-                to_write = min(n_out, remaining)
-                out[:to_write] = self.audio_buffer[self.buffer_index: self.buffer_index + to_write]
-                self.buffer_index += to_write
-                n_written = to_write
+        # --- Tag START (tx_sob) ---
+        if self.new_burst_started:
+            self.add_item_tag(
+                0,
+                self.nitems_written(0),
+                pmt.intern("tx_sob"),
+                pmt.PMT_T
+            )
+            self.new_burst_started = False
 
-                # === Insertion of STOP tag (tx_eob) ===
-                # Let's check if we have just finished writing the entire buffer.
-                if self.buffer_index >= len(self.audio_buffer):
-                    # The tag must be placed on the last sample just written.
-                    # Absolute index = nitems_written + (samples written now) - 1
-                    tag_index = self.nitems_written(0) + n_written - 1
+        if remaining > 0:
+            to_write = min(n_out, remaining)
+            out_audio[:to_write] = self.audio_buffer[self.buffer_index: self.buffer_index + to_write]
+            self.buffer_index += to_write
+            n_written = to_write
 
-                    self.add_item_tag(0,
-                                      tag_index,
-                                      pmt.intern("tx_eob"),
-                                      pmt.PMT_T)
+            # --- Tag STOP (tx_eob) ---
+            if self.buffer_index >= len(self.audio_buffer):
+                tag_index = self.nitems_written(0) + n_written - 1
+                self.add_item_tag(
+                    0,
+                    tag_index,
+                    pmt.intern("tx_eob"),
+                    pmt.PMT_T
+                )
 
-                    self.transmitting = False
-                    self.buffer_index = 0
-                # =================================================
-            else:
                 self.transmitting = False
                 self.buffer_index = 0
+                print("[SelCall TX] Burst completato. Stop stream.")
 
-        if n_written < n_out:
-            out[n_written:] = 0.0
-
-        return n_out
+        # 4. Important: Do not fill in the rest with zeros!
+        # Only return what you have actually written.
+        return n_written
