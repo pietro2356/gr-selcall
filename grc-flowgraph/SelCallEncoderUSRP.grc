@@ -46,33 +46,15 @@ blocks:
     rotation: 0
     state: enabled
 - name: band
-  id: variable_qtgui_chooser
+  id: variable
   parameters:
     comment: ''
-    gui_hint: ''
-    label: Band
-    label0: NB PMR 12.5k
-    label1: NB VHF 12k
-    label2: WB FM
-    label3: FM RADIO
-    label4: ''
-    labels: '[]'
-    num_opts: '3'
-    option0: int(25e2)
-    option1: int(5e3)
-    option2: int(38e3)
-    option3: int(993e5)
-    option4: '4'
-    options: '[0, 1, 2]'
-    orient: Qt.QVBoxLayout
-    type: int
-    value: int(5e3)
-    widget: combo_box
+    value: int(25e2)
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 404.0]
+    coordinate: [704, 8.0]
     rotation: 0
     state: enabled
 - name: cutoff
@@ -96,19 +78,19 @@ blocks:
     label0: PMR 10
     label1: PMR 11
     label2: PMR 12
-    label3: PMR 13
+    label3: PMR 4
     label4: ''
     labels: '[]'
     num_opts: '4'
     option0: '446118750'
     option1: '446131250'
     option2: '446143750'
-    option3: '446156250'
+    option3: '446043750'
     option4: '4'
     options: '[0, 1, 2]'
     orient: Qt.QVBoxLayout
     type: int
-    value: '446118750'
+    value: '446043750'
     widget: combo_box
   states:
     bus_sink: false
@@ -126,7 +108,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [608, 8.0]
+    coordinate: [600, 8.0]
     rotation: 0
     state: enabled
 - name: samp_rate
@@ -147,14 +129,14 @@ blocks:
     comment: ''
     gui_hint: ''
     label: Selective List
-    label0: CO 118 T
-    label1: MSA1 - T
-    label2: MSA2 - T
-    label3: MSB1 - CB
-    label4: ELI1 - DD
+    label0: VVF 1
+    label1: MSA 1
+    label2: MSA 2
+    label3: MSB 1
+    label4: ELI 1
     labels: '[]'
     num_opts: '5'
-    option0: '18501'
+    option0: '85864'
     option1: '18533'
     option2: '18537'
     option3: '19931'
@@ -266,88 +248,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [464, 336.0]
-    rotation: 180
-    state: enabled
-- name: qtgui_freq_sink_x_0
-  id: qtgui_freq_sink_x
-  parameters:
-    affinity: ''
-    alias: ''
-    alpha1: '1.0'
-    alpha10: '1.0'
-    alpha2: '1.0'
-    alpha3: '1.0'
-    alpha4: '1.0'
-    alpha5: '1.0'
-    alpha6: '1.0'
-    alpha7: '1.0'
-    alpha8: '1.0'
-    alpha9: '1.0'
-    autoscale: 'False'
-    average: '1.0'
-    axislabels: 'True'
-    bw: band
-    color1: '"blue"'
-    color10: '"dark blue"'
-    color2: '"red"'
-    color3: '"green"'
-    color4: '"black"'
-    color5: '"cyan"'
-    color6: '"magenta"'
-    color7: '"yellow"'
-    color8: '"dark red"'
-    color9: '"dark green"'
-    comment: ''
-    ctrlpanel: 'True'
-    fc: freq_ch
-    fftsize: '1024'
-    freqhalf: 'True'
-    grid: 'True'
-    gui_hint: ''
-    label: Relative Gain
-    label1: ''
-    label10: ''''''
-    label2: ''''''
-    label3: ''''''
-    label4: ''''''
-    label5: ''''''
-    label6: ''''''
-    label7: ''''''
-    label8: ''''''
-    label9: ''''''
-    legend: 'True'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    name: '""'
-    nconnections: '1'
-    norm_window: 'False'
-    showports: 'False'
-    tr_chan: '0'
-    tr_level: '0.0'
-    tr_mode: qtgui.TRIG_MODE_FREE
-    tr_tag: '""'
-    type: complex
-    units: dB
-    update_time: '0.10'
-    width1: '1'
-    width10: '1'
-    width2: '1'
-    width3: '1'
-    width4: '1'
-    width5: '1'
-    width6: '1'
-    width7: '1'
-    width8: '1'
-    width9: '1'
-    wintype: window.WIN_HAMMING
-    ymax: '10'
-    ymin: '-140'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [824, 512.0]
+    coordinate: [568, 320.0]
     rotation: 180
     state: enabled
 - name: qtgui_ledindicator_0
@@ -372,77 +273,16 @@ blocks:
     coordinate: [624, 224.0]
     rotation: 180
     state: enabled
-- name: qtgui_waterfall_sink_x_0
-  id: qtgui_waterfall_sink_x
-  parameters:
-    affinity: ''
-    alias: ''
-    alpha1: '1.0'
-    alpha10: '1.0'
-    alpha2: '1.0'
-    alpha3: '1.0'
-    alpha4: '1.0'
-    alpha5: '1.0'
-    alpha6: '1.0'
-    alpha7: '1.0'
-    alpha8: '1.0'
-    alpha9: '1.0'
-    axislabels: 'True'
-    bw: band
-    color1: '0'
-    color10: '0'
-    color2: '0'
-    color3: '0'
-    color4: '0'
-    color5: '0'
-    color6: '0'
-    color7: '0'
-    color8: '0'
-    color9: '0'
-    comment: ''
-    fc: freq_ch
-    fftsize: '1024'
-    freqhalf: 'True'
-    grid: 'False'
-    gui_hint: ''
-    int_max: '10'
-    int_min: '-140'
-    label1: ''
-    label10: ''
-    label2: ''
-    label3: ''
-    label4: ''
-    label5: ''
-    label6: ''
-    label7: ''
-    label8: ''
-    label9: ''
-    legend: 'True'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    name: '""'
-    nconnections: '1'
-    showports: 'False'
-    type: complex
-    update_time: '0.10'
-    wintype: window.WIN_HAMMING
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [824, 432.0]
-    rotation: 180
-    state: enabled
 - name: selcall_selcall_encoder_0
   id: selcall_selcall_encoder
   parameters:
     affinity: ''
     alias: ''
-    amplitude: '0.8'
+    amplitude: '1'
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    own_id: '11501'
+    own_id: '18501'
     protocol: CCIR-1
     sample_rate: audio_samp_rate
   states:
@@ -726,14 +566,12 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [832, 296.0]
+    coordinate: [880, 280.0]
     rotation: 180
     state: enabled
 
 connections:
 - [Sel_sender, pressed, selcall_selcall_encoder_0, msg_in]
-- [analog_nbfm_tx_0, '0', qtgui_freq_sink_x_0, '0']
-- [analog_nbfm_tx_0, '0', qtgui_waterfall_sink_x_0, '0']
 - [analog_nbfm_tx_0, '0', uhd_usrp_sink_0_0, '0']
 - [selcall_selcall_encoder_0, '0', analog_nbfm_tx_0, '0']
 - [selcall_selcall_encoder_0, '0', audio_sink_0, '0']
