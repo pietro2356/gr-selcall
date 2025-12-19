@@ -43,6 +43,9 @@ class selcall_encoder(gr.sync_block):
         self.transmitting = False
         self.last_tx_state = False  # Per edge detection
 
+        # --- Flag to manage USRP burst start TAGs ---
+        self.new_burst_started = False
+
         # --- Message Port ---
         self.port_name = pmt.intern("msg_in")
         self.message_port_register_in(self.port_name)
@@ -146,13 +149,17 @@ class selcall_encoder(gr.sync_block):
         # Building the complete sequence: SOURCE - RECIPIENT
         # The character “-” will tell the next loop to insert the pause.
         full_sequence = f"{self.own_id}-{dest_code}"
-
         print(f"[SelCall Encoder] Sent: {self.own_id} -> {dest_code} (Seq: {full_sequence})")
-
         full_wave = np.array([], dtype=np.float32)
 
         # Split to manage parts (Part 0 = Source, Part 1 = Dest)
         parts = full_sequence.split('-')
+
+        # === Add Initial Silence (Padding) ===
+        # 50ms of silence to allow time for the TX to open
+        padding = np.zeros(int(self.fs * 0.05), dtype=np.float32)
+        full_wave = np.concatenate((full_wave, padding))
+        # ========================================================
 
         for i, part in enumerate(parts):
             # If we are between one part and another, we insert a pause.
@@ -175,9 +182,17 @@ class selcall_encoder(gr.sync_block):
 
                 last_char = char
 
+        # === Addition of Final Silence ===
+        # A little queue to avoid clicks when shutting down
+        full_wave = np.concatenate((full_wave, padding))
+        # ============================================
+
         self.audio_buffer = full_wave
         self.buffer_index = 0
         self.transmitting = True
+
+        # === This is a new package ===
+        self.new_burst_started = True
 
     # --- Helper functions for PTT / Messaging ---s
     def _send_ptt_message(self, state):
@@ -202,11 +217,37 @@ class selcall_encoder(gr.sync_block):
         if self.transmitting:
             remaining = len(self.audio_buffer) - self.buffer_index
 
+            # === Insertion of START tag (tx_sob) ===
+            if self.new_burst_started:
+                # Writes the tag on sample number 0 of this block
+                self.add_item_tag(0,  # Output port (0)
+                                  self.nitems_written(0),  # Absolute index of the sample
+                                  pmt.intern("tx_sob"),  # Key
+                                  pmt.PMT_T)  # Value (True)
+                self.new_burst_started = False
+            # ==================================================
+
             if remaining > 0:
                 to_write = min(n_out, remaining)
                 out[:to_write] = self.audio_buffer[self.buffer_index: self.buffer_index + to_write]
                 self.buffer_index += to_write
                 n_written = to_write
+
+                # === Insertion of STOP tag (tx_eob) ===
+                # Let's check if we have just finished writing the entire buffer.
+                if self.buffer_index >= len(self.audio_buffer):
+                    # The tag must be placed on the last sample just written.
+                    # Absolute index = nitems_written + (samples written now) - 1
+                    tag_index = self.nitems_written(0) + n_written - 1
+
+                    self.add_item_tag(0,
+                                      tag_index,
+                                      pmt.intern("tx_eob"),
+                                      pmt.PMT_T)
+
+                    self.transmitting = False
+                    self.buffer_index = 0
+                # =================================================
             else:
                 self.transmitting = False
                 self.buffer_index = 0
