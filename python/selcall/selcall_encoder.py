@@ -191,7 +191,6 @@ class selcall_encoder(gr.sync_block):
         self.buffer_index = 0
         self.transmitting = True
 
-        # === This is a new package ===
         self.new_burst_started = True
 
     # --- Helper functions for PTT / Messaging ---s
