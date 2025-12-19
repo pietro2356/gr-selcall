@@ -136,7 +136,6 @@ class selcall_encoder(gr.sync_block):
         The block constructs: Source + “-” + Dest (e.g. ‘12345-67890’).
         """
 
-        # FIXME: Extract destination code from PMT message
         if pmt.is_null(msg):
             print("[SelCall Encoder] Received null message, ignoring.")
             return
@@ -147,10 +146,10 @@ class selcall_encoder(gr.sync_block):
             print("[SelCall Encoder] Received empty destination code, ignoring.")
             return
 
-        # Building the complete sequence: SOURCE - RECIPIENT
-        # The character “-” will tell the next loop to insert the pause.
-        full_sequence = f"{self.own_id}-{dest_code}"
-        print(f"[SelCall Encoder] Sent: {self.own_id} -> {dest_code} (Seq: {full_sequence})")
+        # Building the complete sequence: DESTINATION + PAUSE + SOURCE
+        # The character “-” will tell the next loop to insert the pause character.
+        full_sequence = f"{dest_code}-{self.own_id}"
+        print(f"[SelCall Encoder] Destination: {dest_code} - Source: {self.own_id} (Seq: {full_sequence})")
         full_wave = np.array([], dtype=np.float32)
 
         # Split to manage parts (Part 0 = Source, Part 1 = Dest)
