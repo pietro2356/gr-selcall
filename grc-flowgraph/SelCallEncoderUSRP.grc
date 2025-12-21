@@ -74,7 +74,7 @@ blocks:
   parameters:
     comment: ''
     gui_hint: ''
-    label: Frequency
+    label: Channel
     label0: PMR 10
     label1: PMR 11
     label2: PMR 12
@@ -129,14 +129,14 @@ blocks:
     comment: ''
     gui_hint: ''
     label: Selective List
-    label0: VVF 1
-    label1: MSA 1
-    label2: MSA 2
-    label3: MSB 1
-    label4: ELI 1
+    label0: VVF1 - 85864
+    label1: MSA1 - 18533
+    label2: MSA2 - 18537
+    label3: MSB1 - 40931
+    label4: ELI1 - 18515
     labels: '[]'
     num_opts: '5'
-    option0: '85864'
+    option0: '85345'
     option1: '18533'
     option2: '18537'
     option3: '19931'
@@ -144,7 +144,7 @@ blocks:
     options: '[0, 1, 2]'
     orient: Qt.QVBoxLayout
     type: string
-    value: '18533'
+    value: '85345'
     widget: combo_box
   states:
     bus_sink: false
@@ -248,7 +248,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [568, 320.0]
+    coordinate: [560, 328.0]
     rotation: 180
     state: enabled
 - name: qtgui_ledindicator_0
@@ -259,7 +259,7 @@ blocks:
     cellalignment: '2'
     comment: ''
     gui_hint: ''
-    label: TX
+    label: Transmission status
     maxSize: '40'
     offColor: red
     onColor: green
@@ -270,7 +270,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [624, 224.0]
+    coordinate: [608, 224.0]
     rotation: 180
     state: enabled
 - name: selcall_selcall_encoder_0
@@ -405,7 +405,7 @@ blocks:
     comment: ''
     dev_addr: '""'
     dev_args: ''
-    gain0: '0'
+    gain0: '0.5'
     gain1: '0'
     gain10: '0'
     gain11: '0'
@@ -437,7 +437,7 @@ blocks:
     gain7: '0'
     gain8: '0'
     gain9: '0'
-    gain_type0: default
+    gain_type0: normalized
     gain_type1: default
     gain_type10: default
     gain_type11: default

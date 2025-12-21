@@ -78,19 +78,19 @@ blocks:
     label0: PMR 10
     label1: PMR 11
     label2: PMR 12
-    label3: PMR 13
+    label3: PMR 4
     label4: ''
     labels: '[]'
     num_opts: '4'
     option0: '446118750'
     option1: '446131250'
     option2: '446143750'
-    option3: '446156250'
+    option3: '446043750'
     option4: '4'
     options: '[0, 1, 2]'
     orient: Qt.QVBoxLayout
     type: int
-    value: '446118750'
+    value: '446043750'
     widget: combo_box
   states:
     bus_sink: false
@@ -251,7 +251,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [672, 296.0]
+    coordinate: [704, 304.0]
     rotation: 0
     state: enabled
 - name: audio_sink_0_0
@@ -268,8 +268,25 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1336.0, 440]
+    coordinate: [1312.0, 472]
     rotation: 270
+    state: enabled
+- name: audio_sink_0_1
+  id: audio_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    device_name: ''
+    num_inputs: '1'
+    ok_to_block: 'True'
+    samp_rate: audio_samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [952, 504.0]
+    rotation: 0
     state: enabled
 - name: band_pass_filter_0
   id: band_pass_filter
@@ -308,7 +325,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [344, 392.0]
+    coordinate: [344, 376.0]
     rotation: 180
     state: enabled
 - name: low_pass_filter_0
@@ -416,6 +433,28 @@ blocks:
     coordinate: [608, 208.0]
     rotation: 0
     state: enabled
+- name: qtgui_ledindicator_0
+  id: qtgui_ledindicator
+  parameters:
+    affinity: ''
+    alias: ''
+    cellalignment: '1'
+    comment: ''
+    gui_hint: ''
+    label: Received Selective
+    maxSize: '40'
+    offColor: red
+    onColor: green
+    position: '1'
+    state: 'False'
+    verticalalignment: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [952, 560.0]
+    rotation: 0
+    state: enabled
 - name: rational_resampler_xxx_0_0
   id: rational_resampler_xxx
   parameters:
@@ -453,7 +492,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1312.0, 224]
+    coordinate: [1288.0, 248]
     rotation: 270
     state: enabled
 - name: selcal_selcall_decoder_0
@@ -484,12 +523,12 @@ blocks:
     alias: ''
     code_length: '5'
     comment: ''
-    debug: 'False'
+    debug: 'True'
     maxoutbuf: '0'
     minoutbuf: '0'
     protocol: CCIR-1
     sample_rate: audio_samp_rate
-    target_code: '50101'
+    target_code: '18533'
     tone_duration_ms: '0.0'
   states:
     bus_sink: false
@@ -497,6 +536,24 @@ blocks:
     bus_structure: null
     coordinate: [704, 368.0]
     rotation: 180
+    state: enabled
+- name: selcall_selcall_ringer_0
+  id: selcall_selcall_ringer
+  parameters:
+    affinity: ''
+    alias: ''
+    amplitude: '0.5'
+    comment: ''
+    duration: '5.0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: audio_samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [704, 496.0]
+    rotation: 0
     state: enabled
 - name: uhd_usrp_source_0
   id: uhd_usrp_source
@@ -947,7 +1004,10 @@ connections:
 - [selcal_selcall_decoder_0, '0', audio_sink_0, '0']
 - [selcal_selcall_decoder_0, selcall_out, blocks_message_debug_0, print]
 - [selcall_selcall_decoder_0, '0', audio_sink_0, '0']
+- [selcall_selcall_decoder_0, ringer, selcall_selcall_ringer_0, trigger]
 - [selcall_selcall_decoder_0, selcall_out, blocks_message_debug_0, print]
+- [selcall_selcall_ringer_0, '0', audio_sink_0_1, '0']
+- [selcall_selcall_ringer_0, led, qtgui_ledindicator_0, state]
 - [uhd_usrp_source_0, '0', qtgui_freq_sink_x_0, '0']
 - [uhd_usrp_source_0, '0', rational_resampler_xxx_0_0, '0']
 
