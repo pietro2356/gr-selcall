@@ -97,6 +97,8 @@ When it receives a message ‘12345’ on `msg_in`, and the `Personal Code` is �
 * **Amplitude:** Tone volume (0.0 - 1.0).
 * **Sample Rate:** Sampling frequency (e.g. 48000).
 
+---
+
 ### 3. Selcall Ringer
 This block functions as an audible alert generator, typically triggered when a specific selective call is successfully decoded. It produces a distinctive two-tone alarm (European Siren style: 800Hz / 1010Hz) and provides a status signal for visual indicators.
 
