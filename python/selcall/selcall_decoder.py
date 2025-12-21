@@ -7,7 +7,6 @@ import pmt
 import time
 
 # Import logic from the provided library files
-# Note: In a standard OOT module, imports might look like 'from my_module import ...'
 from .core.protocols.CCIR import *
 from .core.protocols.ZVEI import *
 from .core.SelectiveCalling import SelectiveCalling
@@ -61,10 +60,14 @@ class selcall_decoder(gr.sync_block):
         self.message_port_name = pmt.intern("selcall_out")
         self.message_port_register_out(self.message_port_name)
 
+        # --- Ringer Port ---
+        self.port_match_event = pmt.intern("ringer")
+        self.message_port_register_out(self.port_match_event)
+
         # --- Audio Gate State ---
         self.gate_open = False
         self.gate_timer_samples = 0
-        self.gate_duration_samples = int(20.0 * self.fs)  # Duration: 20 seconds
+        self.gate_duration_samples = int(5.0 * self.fs)  # Duration: 20 seconds
 
         # [A] Buffer Sizing
         # The analysis window must roughly match the tone duration
@@ -114,6 +117,13 @@ class selcall_decoder(gr.sync_block):
             self.tone_ms = self.user_tone_ms
         else:
             self.tone_ms = base_ms
+
+    def _ring(self, has_to_ring: bool):
+        """ Sends a PMT message to the ringer port to control external ringer logic """
+        self.message_port_pub(
+            self.port_match_event,
+            pmt.cons(pmt.intern("value"), pmt.from_bool(has_to_ring))
+        )
 
     def work(self, input_items, output_items):
         in0 = input_items[0]
@@ -176,6 +186,7 @@ class selcall_decoder(gr.sync_block):
             else:
                 # Timer expired -> Mute
                 self.gate_open = False
+                self._ring(False)
                 out0[:] = 0.0
                 if self.debug_mode:
                     print("[SelCall] Gate closed (timeout).")
@@ -255,6 +266,9 @@ class selcall_decoder(gr.sync_block):
         # Check if Target is inside the decoded string (Source or Dest)
         if target in clean_str:
             match_found = True
+            # Open the Gate & Reset Timer
+            self._ring(True)
+
             self.gate_open = True
             self.gate_timer_samples = self.gate_duration_samples  # Reset/Retrigger Timer
             if self.debug_mode:

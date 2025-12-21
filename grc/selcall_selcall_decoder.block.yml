@@ -65,4 +65,9 @@ outputs:
   domain: message
   id: selcall_out
 
+- label: ringer
+  domain: message
+  id: ringer
+  optional: true
+
 file_format: 1
