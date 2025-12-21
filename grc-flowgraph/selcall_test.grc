@@ -140,7 +140,24 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1064, 144.0]
+    coordinate: [1336, 128.0]
+    rotation: 0
+    state: enabled
+- name: audio_sink_0_0_0
+  id: audio_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    device_name: ''
+    num_inputs: '1'
+    ok_to_block: 'True'
+    samp_rate: audio_samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1344, 344.0]
     rotation: 0
     state: enabled
 - name: blocks_message_debug_0
@@ -178,6 +195,28 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [536, 416.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_ledindicator_0_0_0
+  id: qtgui_ledindicator
+  parameters:
+    affinity: ''
+    alias: ''
+    cellalignment: '2'
+    comment: ''
+    gui_hint: ''
+    label: RINGER LED
+    maxSize: '40'
+    offColor: red
+    onColor: green
+    position: '1'
+    state: 'False'
+    verticalalignment: '2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1320, 416.0]
     rotation: 0
     state: enabled
 - name: selcall_selcall_decoder_0
@@ -220,14 +259,36 @@ blocks:
     coordinate: [440, 152.0]
     rotation: 0
     state: enabled
+- name: selcall_selcall_ringer_0
+  id: selcall_selcall_ringer
+  parameters:
+    affinity: ''
+    alias: ''
+    amplitude: '0.5'
+    comment: ''
+    duration: '5.0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: audio_samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1064, 344.0]
+    rotation: 0
+    state: enabled
 
 connections:
 - [Sel_sender, pressed, selcall_selcall_encoder_0, msg_in]
 - [selcall_selcall_decoder_0, '0', audio_sink_0_0, '0']
+- [selcall_selcall_decoder_0, ringer, blocks_message_debug_0, log]
+- [selcall_selcall_decoder_0, ringer, selcall_selcall_ringer_0, trigger]
 - [selcall_selcall_decoder_0, selcall_out, blocks_message_debug_0, print]
 - [selcall_selcall_encoder_0, '0', audio_sink_0, '0']
 - [selcall_selcall_encoder_0, '0', selcall_selcall_decoder_0, '0']
 - [selcall_selcall_encoder_0, ptt_out, qtgui_ledindicator_0, state]
+- [selcall_selcall_ringer_0, '0', audio_sink_0_0_0, '0']
+- [selcall_selcall_ringer_0, led, qtgui_ledindicator_0_0_0, state]
 
 metadata:
   file_format: 1
