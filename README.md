@@ -11,10 +11,11 @@ The module supports the most widely used standard protocols in PMR/LMR (ZVEI, CC
   * Real-time tone recognition.
   * Filtering based on ‘Target Code’ (opens the audio only if it receives the correct selective).
   * Asynchronous message output (PMT) with decoding metadata.
+  * Ringer output: sends a notification message when the target code is detected.
 
 
 * **Encoder (TX):**
-  * Generation of the complete sequence: `Source` + `Pause` + `Destination`.
+  * Generation of the complete sequence: `Destination` + `Pause` +`Source`.
   * Automatic management of repeat tones (e.g. “E”).
   * **PTT (ptt_out)** signalling via asynchronous message to activate transmitters or GUI.
 
@@ -24,6 +25,7 @@ The module supports the most widely used standard protocols in PMR/LMR (ZVEI, CC
 * GNU Radio 3.8 or higher (tested on 3.10).
 * Python 3.
 * Standard libraries: `numpy`.
+* CMake 3.5 or higher.
 
 ### Compilation
 Compilation can be performed manually or using the `install.sh` script. 
@@ -58,14 +60,14 @@ This block listens to an audio stream, decodes the tones, and only lets the audi
 **Output:**
 * `audioout` (Float): ‘Gated’ audio stream. Contains the original audio only when the gate is open, otherwise silence.
 * `selcall_out` (Message): PMT message containing the decoded code, timestamp and match status.
-
+* `ringer` (Message): PMT message that sends a notification when the target code is detected.
 
 **Parameters:**
 * **Protocol:** Standard to be used (e.g. ZVEI-1).
 * **Target Code:** The selective code that opens the squelch (e.g. ‘12345’).
 * **Code Length:** Expected length of the selective code (usually 5).
-* **Sample Rate:** Sampling frequency (e.g. 48000).
 * **Tone Duration:** Duration of each tone in milliseconds (e.g. 100 ms).
+* **Sample Rate:** Sampling frequency (e.g. 48000).
 * **Debug Mode:** Enables the output of detailed debug messages.
 
 ---
