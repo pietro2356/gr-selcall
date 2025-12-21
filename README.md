@@ -14,10 +14,14 @@ The module supports the most widely used standard protocols in PMR/LMR (ZVEI, CC
   * Ringer output: sends a notification message when the target code is detected.
 
 
-* **Encoder (TX):**
+* **Encoder:**
   * Generation of the complete sequence: `Destination` + `Pause` +`Source`.
   * Automatic management of repeat tones (e.g. “E”).
   * **PTT (ptt_out)** signalling via asynchronous message to activate transmitters or GUI.
+
+* **Ringer Block:**
+  * Audible alert generator with a two-tone siren 🚒.
+  * Visual indicator output via asynchronous message.
 
 ## 🛠️ ️Installation
 ### Prerequisites
@@ -93,6 +97,22 @@ When it receives a message ‘12345’ on `msg_in`, and the `Personal Code` is �
 * **Amplitude:** Tone volume (0.0 - 1.0).
 * **Sample Rate:** Sampling frequency (e.g. 48000).
 
+### 3. Selcall Ringer
+This block functions as an audible alert generator, typically triggered when a specific selective call is successfully decoded. It produces a distinctive two-tone alarm (European Siren style: 800Hz / 1010Hz) and provides a status signal for visual indicators.
+
+
+**Input:**
+* `trigger` (Message): Any asynchronous message received on this port starts (or restarts) the alarm timer.
+
+
+**Output:**
+* `audio_out` (Float): The generated alarm audio stream. Contains the two-tone siren signal when active, otherwise silence.
+* `led` (Message): Boolean signal. Sends True when the alarm starts and False when the duration expires. Designed to drive a QT GUI LED Indicator.
+
+**Parameters:**
+* **Duration:** Length of the alarm in seconds (e.g. 5.0).
+* **Amplitude:** Audio volume level (0.0 - 1.0).
+* **Sample Rate:** Sampling frequency (must match the audio sink).
 ---
 
 ## ⚡ Example of Use (Flowgraph)
@@ -103,16 +123,25 @@ When it receives a message ‘12345’ on `msg_in`, and the `Personal Code` is �
 graph LR
     A[Audio Source / SDR] --> B[NBFM Receive]
     B --> C[Selcall Decoder]
-    C --> D[Audio Sink]
-    C -- msg_out --> E[Message Debug]
+    C -- audio_out --> D[Audio Sink]
+    C -- selcall_out --> E[Message Debug]
+    C -- ringer --> F(Selcall Ringer)
 ```
 
 ### Encoder
 ```mermaid
 graph LR
-    A[QT GUI Message Edit] -- msg --> B[Selcall Generator]
-    B -- audio --> C[NBFM Transmit / Audio Sink]
-    B -- active --> D[Control Logic / LED]
+    A[QT GUI Message Edit] -- msg_in --> B[Selcall Encoder]
+    B -- audio_out --> C[NBFM Transmit / Audio Sink]
+    B -- ptt_out --> D[Control Logic / LED]
+```
+
+### Ringer
+```mermaid
+graph LR
+    A[Selcall Decoder] -- ringer --> B[Selcall Ringer]
+    B -- audio_out --> C[Audio Sink]
+    B -- led --> D[QT GUI LED Indicator]
 ```
 ---
 ## 🤝 Authors
