@@ -22,4 +22,5 @@ except ModuleNotFoundError:
 # import any pure python here
 from .selcall_decoder import selcall_decoder
 from .selcall_encoder import selcall_encoder
+from .selcall_ringer import selcall_ringer
 #

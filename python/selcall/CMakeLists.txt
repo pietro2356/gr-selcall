@@ -24,7 +24,7 @@ gr_python_install(
     __init__.py
     selcall_decoder.py
     selcall_encoder.py
-    DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall
+    selcall_ringer.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/selcall
 )
 
 install(
@@ -54,3 +54,4 @@ add_custom_target(
             ${PROJECT_BINARY_DIR}/test_modules/gnuradio/selcall/)
 GR_ADD_TEST(qa_selcal_decoder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_selcal_decoder.py)
 GR_ADD_TEST(qa_selcall_encoder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_selcall_encoder.py)
+GR_ADD_TEST(qa_selcall_ringer ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_selcall_ringer.py)

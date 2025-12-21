@@ -1,0 +1,62 @@
+id: selcall_selcall_ringer
+label: Selcall Ringer
+category: '[SelCall]'
+
+templates:
+  imports: from gnuradio import selcall
+  make: >
+    selcall.selcall_ringer(
+        sample_rate=${sample_rate},
+        duration=${duration},
+        amplitude=${amplitude}
+    )
+
+documentation: |-
+    SelCall Ringer - User Manual
+    
+    Overview:
+    The SelCall Ringer is designed to generate an audible alert signal upon receiving a trigger event. It generates a two-tone alarm (800Hz / 1010Hz) for a defined duration.
+    
+    Functionality:
+    - Idle State: Outputs silence.
+    - Active State: On receiving any message on 'trigger', it plays the alarm for 'Duration' seconds and sets 'led' to True.
+    
+    Usage:
+    1. Connect a Decoder Ringer output to the 'trigger' input.
+    2. Connect 'audio_out' to an Audio Sink.
+    3. (Optional) Connect 'led' to a QT GUI LED Indicator.
+
+parameters:
+- id: duration
+  label: Duration (s)
+  dtype: float
+  default: 5.0
+
+- id: amplitude
+  label: Amplitude
+  dtype: float
+  default: 0.5
+
+- id: sample_rate
+  label: Sample Rate
+  dtype: int
+  default: audio_samp_rate
+
+# Block Input and Output
+inputs:
+- label: trigger
+  domain: message
+  id: triggerc
+  optional: false
+
+outputs:
+- label: audio_out
+  domain: stream
+  dtype: float
+
+- label: led
+  domain: message
+  id: led
+  optional: true
+
+file_format: 1
