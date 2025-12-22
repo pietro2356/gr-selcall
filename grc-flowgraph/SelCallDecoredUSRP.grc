@@ -382,7 +382,7 @@ blocks:
     color8: '"dark red"'
     color9: '"dark green"'
     comment: ''
-    ctrlpanel: 'True'
+    ctrlpanel: 'False'
     fc: freq_ch
     fftsize: '1024'
     freqhalf: 'True'
