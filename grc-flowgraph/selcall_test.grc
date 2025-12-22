@@ -51,14 +51,14 @@ blocks:
     comment: ''
     gui_hint: ''
     label: Selective List
-    label0: CO 118 T
-    label1: MSA1 - T
-    label2: MSA2 - T
-    label3: MSB1 - CB
-    label4: ELI1 - DD
+    label0: VVF1 - 85345
+    label1: MSA1 - 18533
+    label2: MSA2 - 18537
+    label3: MSB1 - 19931
+    label4: ELI1 - 18515
     labels: '[]'
     num_opts: '5'
-    option0: '18501'
+    option0: '85345'
     option1: '18533'
     option2: '18537'
     option3: '19931'
@@ -66,13 +66,13 @@ blocks:
     options: '[0, 1, 2]'
     orient: Qt.QVBoxLayout
     type: string
-    value: '18533'
+    value: '85345'
     widget: combo_box
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 112.0]
+    coordinate: [8, 144.0]
     rotation: 0
     state: enabled
 - name: sel_id
@@ -123,7 +123,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [592, 320.0]
+    coordinate: [752, 40.0]
     rotation: 0
     state: enabled
 - name: audio_sink_0_0
@@ -157,7 +157,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1344, 344.0]
+    coordinate: [1320, 344.0]
     rotation: 0
     state: enabled
 - name: blocks_message_debug_0
@@ -194,7 +194,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [536, 416.0]
+    coordinate: [752, 272.0]
     rotation: 0
     state: enabled
 - name: qtgui_ledindicator_0_0_0
