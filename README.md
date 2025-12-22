@@ -118,9 +118,10 @@ This block functions as an audible alert generator, typically triggered when a s
 ---
 
 ## ⚡ Example of Use (Flowgraph)
+Inside the [grc-flowgraph](./grc-flowgraph) folder, there are grc files for testing GNURadio blocks once they have been installed.
 
 ### Decoder
-
+[`SelCallDecoderUSRP.grc`](./grc-flowgraph/SelCallDecoderUSRP.grc)
 ```mermaid
 graph LR
     A[Audio Source / SDR] --> B[NBFM Receive]
@@ -131,6 +132,7 @@ graph LR
 ```
 
 ### Encoder
+[`SelCallEncoderUSRP.grc`](./grc-flowgraph/SelCallEncoderUSRP.grc)
 ```mermaid
 graph LR
     A[QT GUI Message Edit] -- msg_in --> B[Selcall Encoder]
@@ -145,6 +147,9 @@ graph LR
     B -- audio_out --> C[Audio Sink]
     B -- led --> D[QT GUI LED Indicator]
 ```
+
+> ℹ️ If you don't have a USRP or SDR device available, you can find the test flowgraph in the [selcall_test](./grc-flowgraph/selcall_test.grc) file, where you can test both encoding and decoding with ringing.
+
 ---
 ## 🤝 Authors
 * **Rocchio Pietro**
