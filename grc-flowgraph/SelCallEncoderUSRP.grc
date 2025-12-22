@@ -129,10 +129,10 @@ blocks:
     comment: ''
     gui_hint: ''
     label: Selective List
-    label0: VVF1 - 85864
+    label0: VVF1 - 85345
     label1: MSA1 - 18533
     label2: MSA2 - 18537
-    label3: MSB1 - 40931
+    label3: MSB1 - 19931
     label4: ELI1 - 18515
     labels: '[]'
     num_opts: '5'

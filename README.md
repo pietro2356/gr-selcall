@@ -82,7 +82,7 @@ This block generates the audio tone sequence to make a call. It automatically co
 
 **Sending logic:**
 When it receives a message ‘12345’ on `msg_in`, and the `Personal Code` is ‘99999’, it will generate tones for:
-`99999` (Source) → `PAUSE` → `12345` (Destination).
+`12345` (Destination) → `PAUSE` → `99999` (Source) .
 
 **Input:**
 * `msg_in` (Message): The **Destination** code (string).
