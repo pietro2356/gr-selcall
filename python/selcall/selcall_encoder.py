@@ -199,12 +199,6 @@ class selcall_encoder(gr.sync_block):
         msg = pmt.cons(pmt.intern("value"), pmt.from_bool(state))
         self.message_port_pub(self.port_name_ptt, msg)
 
-    def _update_ptt_status(self):
-        """Check whether the transmission status has changed and notify if needed"""
-        if self.transmitting != self.last_tx_state:
-            self._send_ptt_message(self.transmitting)
-            self.last_tx_state = self.transmitting
-
     def work(self, input_items, output_items):
         out_audio = output_items[0]
         n_out = len(out_audio)
